@@ -1,8 +1,9 @@
 import React from "react";
 import "./App.css";
-import PokemonInfo from "./components/PokemonInfo"
-import PokemonFilter from "./components/PokemonFilter"
-import PokemonTable from "./components/PokemonTable"
+import PokemonInfo from "./components/PokemonInfo";
+import PokemonFilter from "./components/PokemonFilter";
+import PokemonTable from "./components/PokemonTable";
+import PokemonContext from "./PokemonContext";
 
 
 
@@ -22,6 +23,16 @@ function App() {
     }
 
     return (
+      <PokemonContext.Provider
+        value={{
+          search,
+          pokemon,
+          selectedPokemon,
+          setSearch,
+          setPokemon,
+          setSelectedPokemon,
+        }}
+      >
         <div
             style={{
                 margin: "auto",
@@ -30,7 +41,6 @@ function App() {
             }}
         >
             <h1 className="title">Pokemon Search</h1>
-
             <div
                 style={{
                     display: "grid",
@@ -39,20 +49,14 @@ function App() {
                 }}
             >
                 <div>
-                    <PokemonFilter
-                        search={search}
-                        setSearch={setSearch}
-                    />
-                    <PokemonTable
-                        search={search}
-                        pokemon={pokemon}
-                        setSelectedPokemon={setSelectedPokemon}
-                    />
-                    
+                    <PokemonFilter />
+                    <PokemonTable />
                 </div>
-                {selectedPokemon && <PokemonInfo {...selectedPokemon} />}
+                <PokemonInfo />
             </div>
         </div>
+      </PokemonContext.Provider>
+        
     );
 }
 
