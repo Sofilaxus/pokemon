@@ -1,13 +1,24 @@
 import React from "react";
 import "./App.css";
 import PropTypes from "prop-types";
+import "@fontsource/roboto/300.css";
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+import "@fontsource/roboto/700.css";
+import { Button } from "@mui/material";
 
 const PokemonRow = ({ pokemon, onSelect }) => (
     <tr>
         <td>{pokemon.name.english}</td>
         <td>{pokemon.type.join(", ")}</td>
         <td>
-            <button onClick={() => onSelect(pokemon)}>Select!</button>
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={() => onSelect(pokemon)}
+            >
+                Select!
+            </Button>
         </td>
     </tr>
 );
@@ -26,12 +37,14 @@ const PokemonInfo = ({ name, base }) => (
     <div>
         <h1>{name.english}</h1>
         <table>
-            {Object.keys(base).map((key) => (
-                <tr key={key}>
-                    <td>{key}</td>
-                    <td>{base[key]}</td>
-                </tr>
-            ))}
+            <tbody>
+                {Object.keys(base).map((key) => (
+                    <tr key={key}>
+                        <td>{key}</td>
+                        <td>{base[key]}</td>
+                    </tr>
+                ))}
+            </tbody>
         </table>
     </div>
 );
