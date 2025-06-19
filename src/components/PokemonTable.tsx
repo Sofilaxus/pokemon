@@ -88,6 +88,18 @@ const PokemonTable = () => {
           )
         : pokemonList;
 
+    const getPokemonId = (url: string) => {
+        const match = url.match(/\/pokemon\/(\d+)\//);
+        return match ? match[1] : null;
+    };
+
+    const getImageUrl = (url: string) => {
+        const id = getPokemonId(url);
+        return id
+            ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`
+            : "";
+    };
+
     const canGoPrevious = offset > 0;
     const canGoNext = offset + limit < count;
     const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -128,6 +140,11 @@ const PokemonTable = () => {
                             }}
                             onClick={() => fetchPokemonDetails(pokemon.url)}
                         >
+                            <img
+                                src={getImageUrl(pokemon.url)}
+                                alt={pokemon.name}
+                                style={{ width: "50px", marginRight: "1rem" }}
+                            />
                             <ListItemText primary={capitalize(pokemon.name)} />
                         </ListItemButton>
                     </ListItem>
