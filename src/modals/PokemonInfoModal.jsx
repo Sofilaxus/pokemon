@@ -1,4 +1,6 @@
 import React from "react";
+import { IconButton } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
 const modalStyle = {
     position: "fixed",
@@ -33,6 +35,14 @@ const PokemonInfoModal = ({ pokemon, onClose }) => {
         <>
             <div style={overlayStyle} onClick={onClose} />
             <div style={modalStyle}>
+                <IconButton
+                    onClick={onClose}
+                    sx={{ position: "absolute", top: 8, right: 8 }}
+                    aria-label="close"
+                >
+                    <CloseIcon />
+                </IconButton>
+
                 <h2>{capitalize(pokemon.name)}</h2>
 
                 {pokemon.sprites?.front_default && (
@@ -73,8 +83,6 @@ const PokemonInfoModal = ({ pokemon, onClose }) => {
                         </li>
                     ))}
                 </ul>
-
-                <button onClick={onClose}>Close</button>
             </div>
         </>
     );
