@@ -42,22 +42,11 @@ const PokemonInfoModal = ({ pokemon, onClose }) => {
                         style={{ width: "120px", marginBottom: "1rem" }}
                     />
                 )}
-
-                <p>
-                    <strong>ID:</strong> {pokemon.id}
-                </p>
-                <p>
-                    <strong>Base Experience:</strong> {pokemon.base_experience}
-                </p>
-                <p>
-                    <strong>Height:</strong> {pokemon.height}
-                </p>
-                <p>
-                    <strong>Weight:</strong> {pokemon.weight}
-                </p>
                 <p>
                     <strong>Types:</strong>{" "}
-                    {pokemon.types.map((t) => capitalize(t.type.name)).join(", ")}
+                    {pokemon.types
+                        .map((t) => capitalize(t.type.name))
+                        .join(", ")}
                 </p>
                 <p>
                     <strong>Abilities:</strong>{" "}
@@ -65,6 +54,15 @@ const PokemonInfoModal = ({ pokemon, onClose }) => {
                         .map((a) => capitalize(a.ability.name))
                         .join(", ")}
                 </p>
+                <p>
+                    <strong>Height:</strong> {(pokemon.height / 10).toFixed(1)}{" "}
+                    m
+                </p>
+                <p>
+                    <strong>Weight:</strong> {(pokemon.weight / 10).toFixed(1)}{" "}
+                    kg
+                </p>
+
                 <p>
                     <strong>Stats:</strong>
                 </p>
