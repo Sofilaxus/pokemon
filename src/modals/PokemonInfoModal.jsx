@@ -39,7 +39,7 @@ const PokemonInfoModal = ({ pokemon, onClose }) => {
                     <img
                         src={pokemon.sprites.front_default}
                         alt={pokemon.name}
-                        style={{ width: "120px", marginBottom: "1rem" }}
+                        style={{ width: "150px", marginBottom: "1rem" }}
                     />
                 )}
                 <p>
