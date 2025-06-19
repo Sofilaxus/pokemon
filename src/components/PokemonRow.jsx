@@ -1,29 +1,18 @@
 import React from "react";
 import { Button } from "@mui/material";
-import PokemonType from "../PokemonType";
-import PropTypes from "prop-types";
 
 
-const PokemonRow = ({ pokemon, onClick }) => (
-    <>
-        <tr key={pokemon.id}>
-            <td>{pokemon.name.english}</td>
-            <td>{pokemon.type.join(", ")}</td>
+const PokemonRow = ({ pokemon, onClick }) => {
+    return (
+        <tr onClick={onClick} style={{ cursor: "pointer" }}>
             <td>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => onClick(pokemon)}
-                >
-                    More information
-                </Button>
+                <a href="#" onClick={(e) => e.preventDefault()}>
+                    {pokemon.name.english}
+                </a>
             </td>
+            <td>{pokemon.type.join(", ")}</td>
         </tr>
-    </>
-);
-
-PokemonRow.propTypes = {
-    pokemon: PropTypes.arrayOf(PokemonType),
+    );
 };
 
 export default PokemonRow;
