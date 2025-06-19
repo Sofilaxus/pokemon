@@ -10,6 +10,8 @@ const modalStyle = {
     borderRadius: "8px",
     boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
     zIndex: 1000,
+    maxWidth: "400px",
+    width: "90%",
 };
 
 const overlayStyle = {
@@ -22,6 +24,8 @@ const overlayStyle = {
     zIndex: 999,
 };
 
+const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
 const PokemonInfoModal = ({ pokemon, onClose }) => {
     if (!pokemon) return null;
 
@@ -29,15 +33,49 @@ const PokemonInfoModal = ({ pokemon, onClose }) => {
         <>
             <div style={overlayStyle} onClick={onClose} />
             <div style={modalStyle}>
-                <h2>{pokemon.name}</h2>
-                <img
-                    src={pokemon.sprites?.front_default}
-                    alt={pokemon.name}
-                />
+                <h2>{capitalize(pokemon.name)}</h2>
+
+                {pokemon.sprites?.front_default && (
+                    <img
+                        src={pokemon.sprites.front_default}
+                        alt={pokemon.name}
+                        style={{ width: "120px", marginBottom: "1rem" }}
+                    />
+                )}
+
+                <p>
+                    <strong>ID:</strong> {pokemon.id}
+                </p>
+                <p>
+                    <strong>Base Experience:</strong> {pokemon.base_experience}
+                </p>
+                <p>
+                    <strong>Height:</strong> {pokemon.height}
+                </p>
+                <p>
+                    <strong>Weight:</strong> {pokemon.weight}
+                </p>
                 <p>
                     <strong>Types:</strong>{" "}
-                    {pokemon.types.map((t) => t.type.name).join(", ")}
+                    {pokemon.types.map((t) => capitalize(t.type.name)).join(", ")}
                 </p>
+                <p>
+                    <strong>Abilities:</strong>{" "}
+                    {pokemon.abilities
+                        .map((a) => capitalize(a.ability.name))
+                        .join(", ")}
+                </p>
+                <p>
+                    <strong>Stats:</strong>
+                </p>
+                <ul>
+                    {pokemon.stats.map((s) => (
+                        <li key={s.stat.name}>
+                            {capitalize(s.stat.name)}: {s.base_stat}
+                        </li>
+                    ))}
+                </ul>
+
                 <button onClick={onClose}>Close</button>
             </div>
         </>

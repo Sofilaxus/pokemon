@@ -30,10 +30,19 @@ const PokemonTable = () => {
     const [count, setCount] = useState(0);
     const [pokemonList, setPokemonList] = useState<Pokemon[]>([]);
     const [search, setSearch] = useState<string>("");
-    const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(
-        null
-    );
     const [allPokemon, setAllPokemon] = useState<Pokemon[]>([]);
+
+    const [selectedPokemon, setSelectedPokemon] = useState<any>(null);
+
+    const fetchPokemonDetails = async (url: string) => {
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            setSelectedPokemon(data);
+        } catch (error) {
+            console.error("Error fetching Pokémon details:", error);
+        }
+    };
 
     const { fetchData: fetchPokemonList } = useAxios<TAllPokemon>({
         url: `https://pokeapi.co/api/v2/pokemon/?offset=${offset}&limit=${limit}`,
@@ -103,9 +112,7 @@ const PokemonTable = () => {
                     <ListItem key={pokemon.name} disablePadding>
                         <ListItemButton
                             sx={{
-                                "&.MuiListItemButton-root": {
-
-                                },
+                                "&.MuiListItemButton-root": {},
                                 "&.Mui-focusVisible": {
                                     backgroundColor: "#2e8b57",
                                     color: "white",
@@ -119,7 +126,7 @@ const PokemonTable = () => {
                                     color: "white",
                                 },
                             }}
-                            onClick={() => setSelectedPokemon(pokemon)}
+                            onClick={() => fetchPokemonDetails(pokemon.url)}
                         >
                             <ListItemText primary={capitalize(pokemon.name)} />
                         </ListItemButton>
