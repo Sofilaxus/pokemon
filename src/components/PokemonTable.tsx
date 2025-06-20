@@ -124,7 +124,7 @@ const PokemonTable = () => {
     const totalPages = Math.ceil(count / limit);
 
     return (
-        <Box sx={{ display: "" }}>
+        <Box className="background-color" sx={{ width: 900 }}>
             <Box sx={{ padding: 2 }}>
                 <TextField
                     fullWidth

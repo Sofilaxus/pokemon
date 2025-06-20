@@ -12,3 +12,28 @@ input {
   font-size: x-large;
   padding: 0.2rem;
 }
+
+.background {
+    position: relative;
+    z-index: 1;
+}
+
+.background::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('resources/images/pokemon.jpg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    z-index: -1;
+    min-width: "100vh";
+    min-height: "100vh";
+}
+
+.background-color {
+  background-color: #f0f0f0;
+}
