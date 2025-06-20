@@ -1,7 +1,8 @@
 import React from "react";
 import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import FavoriteIcon from "@mui/icons-material/Favorite";
+import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
+import useSound from "use-sound";
 
 const modalStyle = {
     position: "fixed",
@@ -32,6 +33,22 @@ const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 const PokemonInfoModal = ({ pokemon, onClose }) => {
     if (!pokemon) return null;
 
+    const PlaySound = () => {
+        const [play] = useSound(pokemon.cries?.latest, {
+            volume: 0.15,
+        });
+
+        return (
+            <IconButton
+                onClick={play}
+                sx={{ position: "center" }}
+                aria-label="sound"
+            >
+                <PlayCircleOutlineIcon />
+            </IconButton>
+        );
+    };
+
     return (
         <>
             <div style={overlayStyle} onClick={onClose} />
@@ -48,11 +65,16 @@ const PokemonInfoModal = ({ pokemon, onClose }) => {
 
                 {pokemon.sprites?.front_default && (
                     <img
-                        src={pokemon.sprites.front_default}
+                        src={pokemon.sprites?.other?.showdown?.front_default}
                         alt={pokemon.name}
                         style={{ width: "150px", marginBottom: "1rem" }}
                     />
                 )}
+
+                <div>
+                    Play sound: <PlaySound />
+                </div>
+
                 <p>
                     <strong>Types:</strong>{" "}
                     {pokemon.types
