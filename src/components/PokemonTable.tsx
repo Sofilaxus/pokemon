@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import {
     Box,
     Button,
+    IconButton,
+    InputAdornment,
     List,
     ListItem,
     ListItemButton,
@@ -9,6 +11,7 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import PokemonInfoModal from "../modals/PokemonInfoModal";
 import { useAxios } from "../hooks/UseApiHook.tsx";
 
@@ -100,6 +103,10 @@ const PokemonTable = () => {
             : "";
     };
 
+    const handleClearSearch = () => {
+        setSearch('');
+    };
+
     const canGoPrevious = offset > 0;
     const canGoNext = offset + limit < count;
     const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -107,13 +114,28 @@ const PokemonTable = () => {
     return (
         <Box sx={{ padding: 2 }}>
             <TextField
-                fullWidth
-                label="Search Pokémon"
-                variant="outlined"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                sx={{ marginBottom: 2 }}
-            />
+            fullWidth
+            label="Search Pokémon"
+            variant="outlined"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            sx={{ marginBottom: 2 }}
+            InputProps={{
+                endAdornment: (
+                    <InputAdornment position="end">
+                        {search && (
+                            <IconButton
+                                aria-label="clear search"
+                                onClick={handleClearSearch}
+                                edge="end"
+                            >
+                                <CloseIcon />
+                            </IconButton>
+                        )}
+                    </InputAdornment>
+                ),
+            }}
+        />
 
             <Typography variant="h6" gutterBottom>
                 There are currently {count} Pokémon!
