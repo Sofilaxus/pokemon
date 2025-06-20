@@ -1,6 +1,7 @@
 import React from "react";
 import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 
 const modalStyle = {
     position: "fixed",
@@ -77,11 +78,50 @@ const PokemonInfoModal = ({ pokemon, onClose }) => {
                     <strong>Stats:</strong>
                 </p>
                 <ul>
-                    {pokemon.stats.map((s) => (
-                        <li key={s.stat.name}>
-                            {capitalize(s.stat.name)}: {s.base_stat}
-                        </li>
-                    ))}
+                    <li>
+                        🧡 HP:{" "}
+                        {
+                            pokemon.stats.find((s) => s.stat.name === "hp")
+                                ?.base_stat
+                        }
+                    </li>
+                    <li>
+                        ⚔️ Attack:{" "}
+                        {
+                            pokemon.stats.find((s) => s.stat.name === "attack")
+                                ?.base_stat
+                        }
+                    </li>
+                    <li>
+                        🛡️ Defense:{" "}
+                        {
+                            pokemon.stats.find((s) => s.stat.name === "defense")
+                                ?.base_stat
+                        }
+                    </li>
+                    <li>
+                        🔥 Special Attack:{" "}
+                        {
+                            pokemon.stats.find(
+                                (s) => s.stat.name === "special-attack"
+                            )?.base_stat
+                        }
+                    </li>
+                    <li>
+                        🧊 Special Defence:{" "}
+                        {
+                            pokemon.stats.find(
+                                (s) => s.stat.name === "special-defense"
+                            )?.base_stat
+                        }
+                    </li>
+                    <li>
+                        💨 Speed:{" "}
+                        {
+                            pokemon.stats.find((s) => s.stat.name === "speed")
+                                ?.base_stat
+                        }
+                    </li>
                 </ul>
             </div>
         </>
