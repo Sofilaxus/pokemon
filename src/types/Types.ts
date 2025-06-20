@@ -2,12 +2,6 @@ export type TTypes = {
     name: string;
 };
 
-export type TPokemonBasics = {
-    id: number;
-    name: string;
-    types: TTypes[];
-};
-
 export type TAllPokemon = {
     count: number;
     next: string;
@@ -17,3 +11,7 @@ export type TAllPokemon = {
         url: string;
     }[];
 };
+
+export type TType = {
+
+}

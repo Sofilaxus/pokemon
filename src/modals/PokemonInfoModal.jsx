@@ -1,4 +1,8 @@
 import React from "react";
+import { IconButton } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
+import useSound from "use-sound";
 
 const modalStyle = {
     position: "fixed",
@@ -10,6 +14,8 @@ const modalStyle = {
     borderRadius: "8px",
     boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
     zIndex: 1000,
+    maxWidth: "400px",
+    width: "90%",
 };
 
 const overlayStyle = {
@@ -22,23 +28,123 @@ const overlayStyle = {
     zIndex: 999,
 };
 
+const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
 const PokemonInfoModal = ({ pokemon, onClose }) => {
     if (!pokemon) return null;
+
+    const PlaySound = () => {
+        const [play] = useSound(pokemon.cries?.latest, {
+            volume: 0.15,
+        });
+
+        return (
+            <IconButton
+                onClick={play}
+                sx={{ position: "center" }}
+                aria-label="sound"
+            >
+                <PlayCircleOutlineIcon />
+            </IconButton>
+        );
+    };
 
     return (
         <>
             <div style={overlayStyle} onClick={onClose} />
             <div style={modalStyle}>
-                <h2>{pokemon.name}</h2>
-                <img
-                    src={pokemon.sprites?.front_default}
-                    alt={pokemon.name}
-                />
+                <IconButton
+                    onClick={onClose}
+                    sx={{ position: "absolute", top: 8, right: 8 }}
+                    aria-label="close"
+                >
+                    <CloseIcon />
+                </IconButton>
+
+                <h2>{capitalize(pokemon.name)}</h2>
+
+                {pokemon.sprites?.front_default && (
+                    <img
+                        src={pokemon.sprites?.other?.showdown?.front_default}
+                        alt={pokemon.name}
+                        style={{ width: "150px", marginBottom: "1rem" }}
+                    />
+                )}
+
+                <div>
+                    Play sound: <PlaySound />
+                </div>
+
                 <p>
                     <strong>Types:</strong>{" "}
-                    {pokemon.types.map((t) => t.type.name).join(", ")}
+                    {pokemon.types
+                        .map((t) => capitalize(t.type.name))
+                        .join(", ")}
                 </p>
-                <button onClick={onClose}>Close</button>
+                <p>
+                    <strong>Abilities:</strong>{" "}
+                    {pokemon.abilities
+                        .map((a) => capitalize(a.ability.name))
+                        .join(", ")}
+                </p>
+                <p>
+                    <strong>Height:</strong> {(pokemon.height / 10).toFixed(1)}{" "}
+                    m
+                </p>
+                <p>
+                    <strong>Weight:</strong> {(pokemon.weight / 10).toFixed(1)}{" "}
+                    kg
+                </p>
+
+                <p>
+                    <strong>Stats:</strong>
+                </p>
+                <ul>
+                    <li>
+                        🧡 HP:{" "}
+                        {
+                            pokemon.stats.find((s) => s.stat.name === "hp")
+                                ?.base_stat
+                        }
+                    </li>
+                    <li>
+                        ⚔️ Attack:{" "}
+                        {
+                            pokemon.stats.find((s) => s.stat.name === "attack")
+                                ?.base_stat
+                        }
+                    </li>
+                    <li>
+                        🛡️ Defense:{" "}
+                        {
+                            pokemon.stats.find((s) => s.stat.name === "defense")
+                                ?.base_stat
+                        }
+                    </li>
+                    <li>
+                        🔥 Special Attack:{" "}
+                        {
+                            pokemon.stats.find(
+                                (s) => s.stat.name === "special-attack"
+                            )?.base_stat
+                        }
+                    </li>
+                    <li>
+                        🧊 Special Defence:{" "}
+                        {
+                            pokemon.stats.find(
+                                (s) => s.stat.name === "special-defense"
+                            )?.base_stat
+                        }
+                    </li>
+                    <li>
+                        💨 Speed:{" "}
+                        {
+                            pokemon.stats.find((s) => s.stat.name === "speed")
+                                ?.base_stat
+                        }
+                    </li>
+                </ul>
             </div>
         </>
     );
