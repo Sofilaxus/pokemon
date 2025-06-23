@@ -2,17 +2,14 @@ import React, { useEffect, useState } from "react";
 import {
     Box,
     Button,
-    IconButton,
-    InputAdornment,
     List,
     ListItem,
     ListItemButton,
     ListItemText,
-    TextField,
     Typography,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import PokemonInfoModal from "../modals/PokemonInfoModal";
+import Search from "./Search.tsx";
 import { useAxios } from "../hooks/UseApiHook.tsx";
 import CircularProgress from "@mui/material/CircularProgress";
 
@@ -29,16 +26,17 @@ type TAllPokemon = {
 };
 
 const PokemonTable = () => {
+
+    // states and stuff
     const [offset, setOffset] = useState(0);
     const limit = 7;
     const [count, setCount] = useState(0);
     const [pokemonList, setPokemonList] = useState<Pokemon[]>([]);
-    const [search, setSearch] = useState<string>("");
     const [allPokemon, setAllPokemon] = useState<Pokemon[]>([]);
     const [isLoadingPage, setIsLoadingPage] = useState(false);
     const [isLoadingModal, setIsLoadingModal] = useState(false);
-
     const [selectedPokemon, setSelectedPokemon] = useState<any>(null);
+    const [search, setSearch] = useState<string>("");
 
     const fetchPokemonDetails = async (url: string) => {
         setIsLoadingModal(true);
@@ -59,7 +57,7 @@ const PokemonTable = () => {
     });
 
     const { fetchData: fetchAllPokemon } = useAxios<TAllPokemon>({
-        url: `https://pokeapi.co/api/v2/pokemon/?offset=0&limit=1302`,
+        url: `https://pokeapi.co/api/v2/pokemon/?offset=0&limit=${count}`,
         initialData: null,
     });
 
@@ -112,10 +110,6 @@ const PokemonTable = () => {
             : "";
     };
 
-    const handleClearSearch = () => {
-        setSearch("");
-    };
-
     const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
     const canGoPrevious = offset > 0;
@@ -126,29 +120,7 @@ const PokemonTable = () => {
     return (
         <Box className="background-color" sx={{ width: 900 }}>
             <Box sx={{ padding: 2 }}>
-                <TextField
-                    fullWidth
-                    label="Search Pokémon"
-                    variant="outlined"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    sx={{ marginBottom: 2 }}
-                    InputProps={{
-                        endAdornment: (
-                            <InputAdornment position="end">
-                                {search && (
-                                    <IconButton
-                                        aria-label="clear search"
-                                        onClick={handleClearSearch}
-                                        edge="end"
-                                    >
-                                        <CloseIcon />
-                                    </IconButton>
-                                )}
-                            </InputAdornment>
-                        ),
-                    }}
-                />
+                <Search search={search} setSearch={setSearch} />
 
                 <Typography variant="h6" gutterBottom>
                     There are currently {count} Pokémon!

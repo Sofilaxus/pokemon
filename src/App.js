@@ -9,9 +9,9 @@ function App() {
     return (
         <div
             style={{
-                margin: "auto",
-                width: "auto",
-                height: "auto",
+                margin: "fixed",
+                width: "fixed",
+                height: "fixed",
                 padding: "1rem",
                 paddingTop: "1rem",
                 paddingBottom: "3rem",
