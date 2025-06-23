@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./App.css";
 import { Box } from "@mui/material";
 import PokemonTable from "./components/PokemonTable.tsx";
@@ -6,6 +6,7 @@ import NavigationBar from "./components/NavigationBar.tsx";
 import logo from "./resources/images/logo.png";
 
 function App() {
+    const [selectedTypes, setSelectedTypes] = useState([]);
     return (
         <div
             style={{
@@ -44,8 +45,11 @@ function App() {
                     gap: 4,
                 }}
             >
-                <NavigationBar />
-                <PokemonTable />
+                <NavigationBar
+                    selectedTypes={selectedTypes}
+                    setSelectedTypes={setSelectedTypes}
+                />
+                <PokemonTable selectedTypes={selectedTypes} />
             </Box>
         </div>
     );

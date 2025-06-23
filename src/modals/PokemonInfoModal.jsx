@@ -4,6 +4,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import useSound from "use-sound";
 import PauseCircleOutlineIcon from "@mui/icons-material/PauseCircleOutline";
+import TypeBadge from "../resources/typecolours.tsx"
 
 const modalStyle = {
     position: "fixed",
@@ -99,10 +100,11 @@ const PokemonInfoModal = ({ pokemon, onClose }) => {
 
                 <p>
                     <strong>Types:</strong>{" "}
-                    {pokemon.types
-                        .map((t) => capitalize(t.type.name))
-                        .join(", ")}
+                    {pokemon.types.map((t) => (
+                        <TypeBadge key={t.type.name} type={t.type.name} />
+                    ))}
                 </p>
+
                 <p>
                     <strong>Abilities:</strong>{" "}
                     {pokemon.abilities

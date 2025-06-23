@@ -1,13 +1,7 @@
 import React, { useEffect, useState } from "react";
-import {
-    Box,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemText,
-    Typography,
-} from "@mui/material";
+import { Box, List, ListItem, ListItemButton, Typography } from "@mui/material";
 import { useAxios } from "../hooks/UseApiHook.tsx";
+import TypeBadge from "../resources/typecolours.tsx";
 
 type Type = {
     name: string;
@@ -21,7 +15,13 @@ type TAllTypes = {
     results: Type[];
 };
 
-const NavigationBar = () => {
+const NavigationBar = ({
+    selectedTypes,
+    setSelectedTypes,
+}: {
+    selectedTypes: string[];
+    setSelectedTypes: (types: string[]) => void;
+}) => {
     const [allTypes, setAllTypes] = useState<Type[]>([]);
 
     const { fetchData: fetchAllTypes } = useAxios<TAllTypes>({
@@ -40,11 +40,17 @@ const NavigationBar = () => {
         }
     };
 
+    const handleClick = (typeName: string) => {
+        if (selectedTypes.includes(typeName)) {
+            setSelectedTypes(selectedTypes.filter((t) => t !== typeName));
+        } else {
+            setSelectedTypes([...selectedTypes, typeName]);
+        }
+    };
+
     useEffect(() => {
         getAllTypes();
     }, []);
-
-    const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
     return (
         <Box
@@ -61,31 +67,28 @@ const NavigationBar = () => {
                 Pokémon Types
             </Typography>
 
-            <Box
-                sx={{
-                    flex: 1,
-                    overflowY: "auto",
-                }}
-            >
+            <Box sx={{ flex: 1, overflowY: "auto" }}>
                 <List>
                     {allTypes.map((type) => (
                         <ListItem key={type.name} disablePadding>
                             <ListItemButton
                                 sx={{
-                                    "&.Mui-focusVisible": {
-                                        backgroundColor: "#2e8b57",
-                                        color: "white",
-                                    },
+                                    backgroundColor: selectedTypes.includes(
+                                        type.name
+                                    )
+                                        ? "#bfbfbf"
+                                        : "transparent",
+                                    color: selectedTypes.includes(type.name)
+                                        ? "white"
+                                        : "black",
                                     ":hover": {
                                         backgroundColor: "#1871ea",
                                         color: "white",
                                     },
                                 }}
-                                onClick={() => {
-                                    console.log(`Clicked type: ${type.name}`);
-                                }}
+                                onClick={() => handleClick(type.name)}
                             >
-                                <ListItemText primary={capitalize(type.name)} />
+                                <TypeBadge type={type.name} />
                             </ListItemButton>
                         </ListItem>
                     ))}
