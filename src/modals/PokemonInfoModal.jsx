@@ -4,7 +4,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import useSound from "use-sound";
 import PauseCircleOutlineIcon from "@mui/icons-material/PauseCircleOutline";
-import TypeBadge from "../resources/typecolours.tsx"
+import TypeBadge from "../resources/typecolours.tsx";
 
 const modalStyle = {
     position: "fixed",
@@ -86,9 +86,13 @@ const PokemonInfoModal = ({ pokemon, onClose }) => {
 
                 <h2>{capitalize(pokemon.name)}</h2>
 
-                {pokemon.sprites?.front_default && (
+                {(pokemon.sprites?.other?.showdown?.front_default ||
+                    pokemon.sprites?.front_default) && (
                     <img
-                        src={pokemon.sprites?.other?.showdown?.front_default}
+                        src={
+                            pokemon.sprites?.other?.showdown?.front_default ||
+                            pokemon.sprites?.front_default
+                        }
                         alt={pokemon.name}
                         style={{ width: "150px", marginBottom: "1rem" }}
                     />
