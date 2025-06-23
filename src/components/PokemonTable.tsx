@@ -9,7 +9,6 @@ import {
     Typography,
 } from "@mui/material";
 import PokemonInfoModal from "../modals/PokemonInfoModal";
-import Search from "./Search.tsx";
 import CircularProgress from "@mui/material/CircularProgress";
 import TypeBadge from "../resources/typecolours.tsx";
 
@@ -18,14 +17,19 @@ type Pokemon = {
     url: string;
 };
 
-const PokemonTable = ({ selectedTypes }: { selectedTypes: string[] }) => {
+const PokemonTable = ({
+    selectedTypes,
+    search,
+}: {
+    selectedTypes: string[];
+    search: string;
+}) => {
     const [count, setCount] = useState(0);
     const [allPokemon, setAllPokemon] = useState<Pokemon[]>([]);
     const [filteredPokemon, setFilteredPokemon] = useState<Pokemon[]>([]);
     const [typeFilteredPokemonNames, setTypeFilteredPokemonNames] = useState<
         string[] | null
     >(null);
-    const [search, setSearch] = useState<string>("");
     const [offset, setOffset] = useState(0);
     const limit = 7;
     const [pokemonTypes, setPokemonTypes] = useState<Record<string, string[]>>(
@@ -208,10 +212,9 @@ const PokemonTable = ({ selectedTypes }: { selectedTypes: string[] }) => {
             sx={{ width: 900, borderRadius: "8px" }}
         >
             <Box sx={{ padding: 2 }}>
-                <Search search={search} setSearch={setSearch} />
-
                 <Typography variant="h6" gutterBottom>
-                    There are currently {count} Pokémon! This list contains {filteredPokemon.length} pokémon.
+                    There are currently {count} Pokémon! This list contains{" "}
+                    {filteredPokemon.length} pokémon.
                 </Typography>
 
                 {isLoadingModal && (
