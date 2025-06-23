@@ -211,7 +211,7 @@ const PokemonTable = ({ selectedTypes }: { selectedTypes: string[] }) => {
                 <Search search={search} setSearch={setSearch} />
 
                 <Typography variant="h6" gutterBottom>
-                    There are currently {count} Pokémon!
+                    There are currently {count} Pokémon! This list contains {filteredPokemon.length} pokémon.
                 </Typography>
 
                 {isLoadingModal && (
