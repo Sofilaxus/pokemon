@@ -1,5 +1,6 @@
-import { IconButton, InputAdornment, TextField } from "@mui/material";
+import { Box, IconButton, InputAdornment, TextField } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import SearchIcon from "@mui/icons-material/Search";
 
 type SearchProps = {
     search: string;
@@ -12,29 +13,38 @@ const Search = ({ search, setSearch }: SearchProps) => {
     };
 
     return (
-        <TextField
-            fullWidth
-            label="Search Pokémon"
-            variant="outlined"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            sx={{ marginBottom: 2 }}
-            InputProps={{
-                endAdornment: (
-                    <InputAdornment position="end">
-                        {search && (
-                            <IconButton
-                                aria-label="clear search"
-                                onClick={handleClearSearch}
-                                edge="end"
-                            >
-                                <CloseIcon />
-                            </IconButton>
-                        )}
-                    </InputAdornment>
-                ),
-            }}
-        />
+        <Box
+            className="background-color-search"
+            sx={{ width: 900, marginBottom: 2 }}
+        >
+            <TextField
+                fullWidth
+                placeholder="Search by pokémon name..."
+                variant="outlined"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                InputProps={{
+                    startAdornment: (
+                        <InputAdornment position="start">
+                            <SearchIcon />
+                        </InputAdornment>
+                    ),
+                    endAdornment: (
+                        <InputAdornment position="end">
+                            {search && (
+                                <IconButton
+                                    aria-label="clear search"
+                                    onClick={handleClearSearch}
+                                    edge="end"
+                                >
+                                    <CloseIcon />
+                                </IconButton>
+                            )}
+                        </InputAdornment>
+                    ),
+                }}
+            />
+        </Box>
     );
 };
 

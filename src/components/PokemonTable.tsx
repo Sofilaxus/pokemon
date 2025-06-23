@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import {
     Box,
     Button,
@@ -9,24 +9,34 @@ import {
     Typography,
 } from "@mui/material";
 import PokemonInfoModal from "../modals/PokemonInfoModal";
-import Search from "./Search.tsx";
 import CircularProgress from "@mui/material/CircularProgress";
+import TypeBadge from "../resources/typecolours.tsx";
 
 type Pokemon = {
     name: string;
     url: string;
 };
 
-const PokemonTable = ({ selectedTypes }: { selectedTypes: string[] }) => {
+const PokemonTable = ({
+    selectedTypes,
+    search,
+}: {
+    selectedTypes: string[];
+    search: string;
+}) => {
     const [count, setCount] = useState(0);
     const [allPokemon, setAllPokemon] = useState<Pokemon[]>([]);
     const [filteredPokemon, setFilteredPokemon] = useState<Pokemon[]>([]);
     const [typeFilteredPokemonNames, setTypeFilteredPokemonNames] = useState<
         string[] | null
     >(null);
-    const [search, setSearch] = useState<string>("");
     const [offset, setOffset] = useState(0);
     const limit = 7;
+    const [pokemonTypes, setPokemonTypes] = useState<Record<string, string[]>>(
+        {}
+    );
+
+    const pokemonTypesRef = useRef<Record<string, string[]>>({});
 
     const [isLoadingPage, setIsLoadingPage] = useState(false);
     const [isLoadingModal, setIsLoadingModal] = useState(false);
@@ -35,24 +45,23 @@ const PokemonTable = ({ selectedTypes }: { selectedTypes: string[] }) => {
 
     const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
-    // Pagination calculations
-    const paginatedList = filteredPokemon.slice(offset, offset + limit);
+    const paginatedList = useMemo(() => {
+        return filteredPokemon.slice(offset, offset + limit);
+    }, [filteredPokemon, offset]);
+
     const totalPages = Math.ceil(filteredPokemon.length / limit);
     const currentPage = Math.floor(offset / limit) + 1;
 
-    // Fetch all Pokémon once on mount
     useEffect(() => {
         const fetchAllPokemon = async () => {
             setIsLoadingPage(true);
             try {
-                // First fetch total count
                 const countRes = await fetch(
                     `https://pokeapi.co/api/v2/pokemon?limit=1`
                 );
                 const countData = await countRes.json();
                 setCount(countData.count);
 
-                // Fetch all Pokémon with the count limit
                 const allRes = await fetch(
                     `https://pokeapi.co/api/v2/pokemon?limit=${countData.count}`
                 );
@@ -68,7 +77,6 @@ const PokemonTable = ({ selectedTypes }: { selectedTypes: string[] }) => {
         fetchAllPokemon();
     }, []);
 
-    // Fetch Pokémon names by selected types and update intersection
     useEffect(() => {
         const getPokemonByType = async (type: string): Promise<string[]> => {
             try {
@@ -93,7 +101,6 @@ const PokemonTable = ({ selectedTypes }: { selectedTypes: string[] }) => {
                 selectedTypes.map((type) => getPokemonByType(type))
             );
 
-            // Intersection: only Pokémon that are in all selected types
             const intersection = allNamesArrays.reduce((acc, arr) =>
                 acc.filter((name) => arr.includes(name))
             );
@@ -104,7 +111,6 @@ const PokemonTable = ({ selectedTypes }: { selectedTypes: string[] }) => {
         filterByTypes();
     }, [selectedTypes]);
 
-    // Apply filtering when search, type filters, or allPokemon changes
     useEffect(() => {
         if (!allPokemon.length) return;
 
@@ -123,10 +129,46 @@ const PokemonTable = ({ selectedTypes }: { selectedTypes: string[] }) => {
         }
 
         setFilteredPokemon(filtered);
-        setOffset(0); // Reset to first page whenever filters change
+        setOffset(0);
     }, [search, typeFilteredPokemonNames, allPokemon]);
 
-    // Fetch Pokémon details for modal
+    useEffect(() => {
+        const fetchTypesForPage = async () => {
+            const newTypes: Record<string, string[]> = {};
+
+            await Promise.all(
+                paginatedList.map(async (pokemon) => {
+                    if (!pokemonTypesRef.current[pokemon.name]) {
+                        try {
+                            const res = await fetch(pokemon.url);
+                            const data = await res.json();
+                            newTypes[pokemon.name] = data.types.map(
+                                (t: any) => t.type.name
+                            );
+                        } catch (error) {
+                            console.error(
+                                "Failed to fetch types for",
+                                pokemon.name,
+                                error
+                            );
+                            newTypes[pokemon.name] = [];
+                        }
+                    }
+                })
+            );
+
+            if (Object.keys(newTypes).length > 0) {
+                pokemonTypesRef.current = {
+                    ...pokemonTypesRef.current,
+                    ...newTypes,
+                };
+                setPokemonTypes(pokemonTypesRef.current);
+            }
+        };
+
+        fetchTypesForPage();
+    }, [paginatedList]);
+
     const fetchPokemonDetails = async (url: string) => {
         setIsLoadingModal(true);
         try {
@@ -140,7 +182,6 @@ const PokemonTable = ({ selectedTypes }: { selectedTypes: string[] }) => {
         }
     };
 
-    // Get Pokémon ID from URL for image
     const getPokemonId = (url: string) => {
         const match = url.match(/\/pokemon\/(\d+)\//);
         return match ? match[1] : null;
@@ -153,7 +194,6 @@ const PokemonTable = ({ selectedTypes }: { selectedTypes: string[] }) => {
             : "";
     };
 
-    // Lock scroll when modal open
     useEffect(() => {
         if (selectedPokemon) {
             document.body.style.overflow = "hidden";
@@ -167,20 +207,33 @@ const PokemonTable = ({ selectedTypes }: { selectedTypes: string[] }) => {
     }, [selectedPokemon]);
 
     return (
-        <Box className="background-color" sx={{ width: 900 }}>
+        <Box
+            className="background-color"
+            sx={{
+                width: 900,
+                height: 600,
+                borderRadius: "8px",
+                display: "flex",
+                flexDirection: "column",
+                overflow: "hidden",
+            }}
+        >
+
             <Box sx={{ padding: 2 }}>
-                <Search search={search} setSearch={setSearch} />
-
                 <Typography variant="h6" gutterBottom>
-                    There are currently {count} Pokémon!
+                    There are currently {count} Pokémon! This list contains{" "}
+                    {filteredPokemon.length} pokémon.
                 </Typography>
+            </Box>
 
-                {isLoadingModal && (
-                    <Box display="flex" justifyContent="center" mt={2}>
-                        <CircularProgress size={40} />
-                    </Box>
-                )}
 
+            <Box
+                sx={{
+                    flex: 1,
+                    overflowY: "auto",
+                    paddingX: 2,
+                }}
+            >
                 {isLoadingPage ? (
                     <Box display="flex" justifyContent="center" mt={4}>
                         <CircularProgress />
@@ -220,60 +273,66 @@ const PokemonTable = ({ selectedTypes }: { selectedTypes: string[] }) => {
                                     <ListItemText
                                         primary={capitalize(pokemon.name)}
                                     />
+                                    {(pokemonTypes[pokemon.name] || []).map(
+                                        (type) => (
+                                            <TypeBadge key={type} type={type} />
+                                        )
+                                    )}
                                 </ListItemButton>
                             </ListItem>
                         ))}
                     </List>
                 )}
-
-                <Box
-                    sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        marginTop: 2,
-                        alignItems: "center",
-                    }}
-                >
-                    <Button
-                        variant="contained"
-                        onClick={() => setOffset(0)}
-                        disabled={offset === 0}
-                    >
-                        {"<< Page 1"}
-                    </Button>
-                    <Button
-                        variant="contained"
-                        onClick={() =>
-                            setOffset((prev) => Math.max(prev - limit, 0))
-                        }
-                        disabled={offset === 0}
-                    >
-                        Previous
-                    </Button>
-                    <Typography variant="body1">
-                        Page {currentPage} / {totalPages || 1}
-                    </Typography>
-                    <Button
-                        variant="contained"
-                        onClick={() =>
-                            setOffset((prev) =>
-                                Math.min(
-                                    prev + limit,
-                                    filteredPokemon.length - limit
-                                )
-                            )
-                        }
-                        disabled={offset + limit >= filteredPokemon.length}
-                    >
-                        Next
-                    </Button>
-                </Box>
-
-                <PokemonInfoModal
-                    pokemon={selectedPokemon}
-                    onClose={() => setSelectedPokemon(null)}
-                />
             </Box>
+
+            <Box
+                sx={{
+                    padding: 2,
+                    borderTop: "1px solid #ccc",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                }}
+            >
+                <Button
+                    variant="contained"
+                    onClick={() => setOffset(0)}
+                    disabled={offset === 0}
+                >
+                    {"<< Page 1"}
+                </Button>
+                <Button
+                    variant="contained"
+                    onClick={() =>
+                        setOffset((prev) => Math.max(prev - limit, 0))
+                    }
+                    disabled={offset === 0}
+                >
+                    Previous
+                </Button>
+                <Typography variant="body1">
+                    Page {currentPage} / {totalPages || 1}
+                </Typography>
+                <Button
+                    variant="contained"
+                    onClick={() =>
+                        setOffset((prev) =>
+                            Math.min(
+                                prev + limit,
+                                filteredPokemon.length - limit
+                            )
+                        )
+                    }
+                    disabled={offset + limit >= filteredPokemon.length}
+                >
+                    Next
+                </Button>
+            </Box>
+
+            <PokemonInfoModal
+                pokemon={selectedPokemon}
+                onClose={() => setSelectedPokemon(null)}
+            />
         </Box>
     );
 };

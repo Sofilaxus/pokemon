@@ -4,9 +4,12 @@ import { Box } from "@mui/material";
 import PokemonTable from "./components/PokemonTable.tsx";
 import NavigationBar from "./components/NavigationBar.tsx";
 import logo from "./resources/images/logo.png";
+import Search from "./components/Search.tsx";
 
 function App() {
     const [selectedTypes, setSelectedTypes] = useState([]);
+    const [search, setSearch] = useState("");
+
     return (
         <div
             style={{
@@ -45,11 +48,22 @@ function App() {
                     gap: 4,
                 }}
             >
+
                 <NavigationBar
                     selectedTypes={selectedTypes}
                     setSelectedTypes={setSelectedTypes}
                 />
-                <PokemonTable selectedTypes={selectedTypes} />
+                <Box
+                    sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        flexDirection: "column",
+                    }}
+                >
+                    <Search search={search} setSearch={setSearch} />
+                    <PokemonTable selectedTypes={selectedTypes} search={search} />
+                </Box>
             </Box>
         </div>
     );

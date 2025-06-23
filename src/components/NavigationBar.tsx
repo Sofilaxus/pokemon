@@ -1,99 +1,77 @@
-import React, { useEffect, useState } from "react";
-import { Box, List, ListItem, ListItemButton, Typography } from "@mui/material";
-import { useAxios } from "../hooks/UseApiHook.tsx";
-import TypeBadge from "../resources/typecolours.tsx";
+import React from "react";
+import {
+    Box,
+    Typography,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails,
+    Button,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import TypeFilter from "./TypeFilter.tsx";
 
-type Type = {
-    name: string;
-    url: string;
-};
-
-type TAllTypes = {
-    count: number;
-    next: string | null;
-    previous: string | null;
-    results: Type[];
-};
-
-const NavigationBar = ({
-    selectedTypes,
-    setSelectedTypes,
-}: {
+interface NavigationBarProps {
     selectedTypes: string[];
     setSelectedTypes: (types: string[]) => void;
+}
+
+const NavigationBar: React.FC<NavigationBarProps> = ({
+    selectedTypes,
+    setSelectedTypes,
 }) => {
-    const [allTypes, setAllTypes] = useState<Type[]>([]);
-
-    const { fetchData: fetchAllTypes } = useAxios<TAllTypes>({
-        url: `https://pokeapi.co/api/v2/type/`,
-        initialData: null,
-    });
-
-    const getAllTypes = async () => {
-        try {
-            const response = await fetchAllTypes();
-            if (response?.data) {
-                setAllTypes(response.data.results);
-            }
-        } catch (error) {
-            console.error("Error fetching all Types:", error);
-        }
+    const handleClear = () => {
+        setSelectedTypes([]);
     };
-
-    const handleClick = (typeName: string) => {
-        if (selectedTypes.includes(typeName)) {
-            setSelectedTypes(selectedTypes.filter((t) => t !== typeName));
-        } else {
-            setSelectedTypes([...selectedTypes, typeName]);
-        }
-    };
-
-    useEffect(() => {
-        getAllTypes();
-    }, []);
 
     return (
         <Box
             sx={{
-                width: 200,
+                width: 250,
                 height: 673,
                 bgcolor: "#f0f0f0",
                 p: 2,
                 display: "flex",
                 flexDirection: "column",
+                borderRadius: "8px",
+                gap: 3,
             }}
         >
             <Typography variant="h6" gutterBottom>
-                Pokémon Types
+                Filters
             </Typography>
 
-            <Box sx={{ flex: 1, overflowY: "auto" }}>
-                <List>
-                    {allTypes.map((type) => (
-                        <ListItem key={type.name} disablePadding>
-                            <ListItemButton
-                                sx={{
-                                    backgroundColor: selectedTypes.includes(
-                                        type.name
-                                    )
-                                        ? "#bfbfbf"
-                                        : "transparent",
-                                    color: selectedTypes.includes(type.name)
-                                        ? "white"
-                                        : "black",
-                                    ":hover": {
-                                        backgroundColor: "#1871ea",
-                                        color: "white",
-                                    },
-                                }}
-                                onClick={() => handleClick(type.name)}
-                            >
-                                <TypeBadge type={type.name} />
-                            </ListItemButton>
-                        </ListItem>
-                    ))}
-                </List>
-            </Box>
+            <Accordion>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="types-content"
+                    id="types-header"
+                >
+                    <Typography>Types</Typography>
+                </AccordionSummary>
+                <AccordionDetails
+                    sx={{
+                        p: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 1,
+                    }}
+                >
+                    <Button
+                        variant="outlined"
+                        color="secondary"
+                        size="small"
+                        onClick={handleClear}
+                        disabled={selectedTypes.length === 0}
+                    >
+                        Clear Selection
+                    </Button>
+
+                    <TypeFilter
+                        selectedTypes={selectedTypes}
+                        setSelectedTypes={setSelectedTypes}
+                    />
+                </AccordionDetails>
+            </Accordion>
         </Box>
     );
 };
