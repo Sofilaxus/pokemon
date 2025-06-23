@@ -209,20 +209,31 @@ const PokemonTable = ({
     return (
         <Box
             className="background-color"
-            sx={{ width: 900, borderRadius: "8px" }}
+            sx={{
+                width: 900,
+                height: 600,
+                borderRadius: "8px",
+                display: "flex",
+                flexDirection: "column",
+                overflow: "hidden",
+            }}
         >
+
             <Box sx={{ padding: 2 }}>
                 <Typography variant="h6" gutterBottom>
                     There are currently {count} Pokémon! This list contains{" "}
                     {filteredPokemon.length} pokémon.
                 </Typography>
+            </Box>
 
-                {isLoadingModal && (
-                    <Box display="flex" justifyContent="center" mt={2}>
-                        <CircularProgress size={40} />
-                    </Box>
-                )}
 
+            <Box
+                sx={{
+                    flex: 1,
+                    overflowY: "auto",
+                    paddingX: 2,
+                }}
+            >
                 {isLoadingPage ? (
                     <Box display="flex" justifyContent="center" mt={4}>
                         <CircularProgress />
@@ -272,55 +283,56 @@ const PokemonTable = ({
                         ))}
                     </List>
                 )}
-
-                <Box
-                    sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        marginTop: 2,
-                        alignItems: "center",
-                    }}
-                >
-                    <Button
-                        variant="contained"
-                        onClick={() => setOffset(0)}
-                        disabled={offset === 0}
-                    >
-                        {"<< Page 1"}
-                    </Button>
-                    <Button
-                        variant="contained"
-                        onClick={() =>
-                            setOffset((prev) => Math.max(prev - limit, 0))
-                        }
-                        disabled={offset === 0}
-                    >
-                        Previous
-                    </Button>
-                    <Typography variant="body1">
-                        Page {currentPage} / {totalPages || 1}
-                    </Typography>
-                    <Button
-                        variant="contained"
-                        onClick={() =>
-                            setOffset((prev) =>
-                                Math.min(
-                                    prev + limit,
-                                    filteredPokemon.length - limit
-                                )
-                            )
-                        }
-                        disabled={offset + limit >= filteredPokemon.length}
-                    >
-                        Next
-                    </Button>
-                </Box>
-
-                <PokemonInfoModal
-                    pokemon={selectedPokemon}
-                    onClose={() => setSelectedPokemon(null)}
-                />
             </Box>
+
+            <Box
+                sx={{
+                    padding: 2,
+                    borderTop: "1px solid #ccc",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                }}
+            >
+                <Button
+                    variant="contained"
+                    onClick={() => setOffset(0)}
+                    disabled={offset === 0}
+                >
+                    {"<< Page 1"}
+                </Button>
+                <Button
+                    variant="contained"
+                    onClick={() =>
+                        setOffset((prev) => Math.max(prev - limit, 0))
+                    }
+                    disabled={offset === 0}
+                >
+                    Previous
+                </Button>
+                <Typography variant="body1">
+                    Page {currentPage} / {totalPages || 1}
+                </Typography>
+                <Button
+                    variant="contained"
+                    onClick={() =>
+                        setOffset((prev) =>
+                            Math.min(
+                                prev + limit,
+                                filteredPokemon.length - limit
+                            )
+                        )
+                    }
+                    disabled={offset + limit >= filteredPokemon.length}
+                >
+                    Next
+                </Button>
+            </Box>
+
+            <PokemonInfoModal
+                pokemon={selectedPokemon}
+                onClose={() => setSelectedPokemon(null)}
+            />
         </Box>
     );
 };
