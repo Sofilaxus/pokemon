@@ -167,7 +167,10 @@ const PokemonTable = ({ selectedTypes }: { selectedTypes: string[] }) => {
     }, [selectedPokemon]);
 
     return (
-        <Box className="background-color" sx={{ width: 900 }}>
+        <Box
+            className="background-color"
+            sx={{ width: 900, borderRadius: "8px" }}
+        >
             <Box sx={{ padding: 2 }}>
                 <Search search={search} setSearch={setSearch} />
 

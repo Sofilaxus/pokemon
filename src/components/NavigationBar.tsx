@@ -61,6 +61,7 @@ const NavigationBar = ({
                 p: 2,
                 display: "flex",
                 flexDirection: "column",
+                borderRadius: "8px",
             }}
         >
             <Typography variant="h6" gutterBottom>
