@@ -26,7 +26,6 @@ type TAllPokemon = {
 };
 
 const PokemonTable = () => {
-
     // states and stuff
     const [offset, setOffset] = useState(0);
     const limit = 7;
@@ -87,12 +86,30 @@ const PokemonTable = () => {
         }
     };
 
+    // useeffects
     useEffect(() => {
         getPokemon();
         getAllPokemon();
     }, [offset]);
 
-    const filteredPokemon = search.trim()
+    useEffect(() => {
+        setOffset(0);
+    }, [search]);
+
+    useEffect(() => {
+        if (selectedPokemon) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "auto";
+        }
+
+        return () => {
+            document.body.style.overflow = "auto";
+        };
+    }, [selectedPokemon]);
+
+    const isSearchMode = search.trim().length > 0;
+    const filteredList = isSearchMode
         ? allPokemon.filter((p) =>
               p.name.toLowerCase().includes(search.toLowerCase())
           )
@@ -112,10 +129,15 @@ const PokemonTable = () => {
 
     const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
+    const paginatedList = isSearchMode
+        ? filteredList.slice(offset, offset + limit)
+        : filteredList;
     const canGoPrevious = offset > 0;
     const canGoNext = offset + limit < count;
+    const totalPages = isSearchMode
+        ? Math.ceil(filteredList.length / limit)
+        : Math.ceil(count / limit);
     const currentPage = Math.floor(offset / limit) + 1;
-    const totalPages = Math.ceil(count / limit);
 
     return (
         <Box className="background-color" sx={{ width: 900 }}>
@@ -138,7 +160,7 @@ const PokemonTable = () => {
                     </Box>
                 ) : (
                     <List>
-                        {filteredPokemon.map((pokemon) => (
+                        {paginatedList.map((pokemon) => (
                             <ListItem key={pokemon.name} disablePadding>
                                 <ListItemButton
                                     sx={{
@@ -195,7 +217,7 @@ const PokemonTable = () => {
                     <Button
                         variant="contained"
                         onClick={() => setOffset(offset - limit)}
-                        disabled={!canGoPrevious}
+                        disabled={offset === 0}
                     >
                         Previous
                     </Button>
@@ -205,7 +227,10 @@ const PokemonTable = () => {
                     <Button
                         variant="contained"
                         onClick={() => setOffset(offset + limit)}
-                        disabled={!canGoNext}
+                        disabled={
+                            offset + limit >=
+                            (isSearchMode ? filteredList.length : count)
+                        }
                     >
                         Next
                     </Button>

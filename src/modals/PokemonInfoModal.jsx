@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import useSound from "use-sound";
+import PauseCircleOutlineIcon from "@mui/icons-material/PauseCircleOutline";
 
 const modalStyle = {
     position: "fixed",
@@ -16,6 +17,8 @@ const modalStyle = {
     zIndex: 1000,
     maxWidth: "400px",
     width: "90%",
+    height: "780px",
+    overflowY: "auto",
 };
 
 const overlayStyle = {
@@ -34,17 +37,36 @@ const PokemonInfoModal = ({ pokemon, onClose }) => {
     if (!pokemon) return null;
 
     const PlaySound = () => {
-        const [play] = useSound(pokemon.cries?.latest, {
+        const [isPlaying, setIsPlaying] = useState(false);
+
+        const [play, { sound, stop }] = useSound(pokemon.cries?.latest, {
             volume: 0.15,
+            onend: () => setIsPlaying(false),
         });
 
+        const togglePlay = () => {
+            if (isPlaying) {
+                stop();
+                setIsPlaying(false);
+            } else {
+                play();
+                setIsPlaying(true);
+            }
+        };
+
+        useEffect(() => {
+            return () => {
+                stop();
+            };
+        }, [stop]);
+
         return (
-            <IconButton
-                onClick={play}
-                sx={{ position: "center" }}
-                aria-label="sound"
-            >
-                <PlayCircleOutlineIcon />
+            <IconButton onClick={togglePlay} aria-label="sound">
+                {isPlaying ? (
+                    <PauseCircleOutlineIcon />
+                ) : (
+                    <PlayCircleOutlineIcon />
+                )}
             </IconButton>
         );
     };
