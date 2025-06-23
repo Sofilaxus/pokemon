@@ -1,5 +1,6 @@
 import { Box, IconButton, InputAdornment, TextField } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import SearchIcon from "@mui/icons-material/Search";
 
 type SearchProps = {
     search: string;
@@ -13,16 +14,21 @@ const Search = ({ search, setSearch }: SearchProps) => {
 
     return (
         <Box
-            className="background-color"
-            sx={{ width: 900, borderRadius: "9px", marginBottom: 2 }}
+            className="background-color-search"
+            sx={{ width: 900, marginBottom: 2 }}
         >
             <TextField
                 fullWidth
-                label="Search by pokémon name..."
+                placeholder="Search by pokémon name..."
                 variant="outlined"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 InputProps={{
+                    startAdornment: (
+                        <InputAdornment position="start">
+                            <SearchIcon />
+                        </InputAdornment>
+                    ),
                     endAdornment: (
                         <InputAdornment position="end">
                             {search && (
