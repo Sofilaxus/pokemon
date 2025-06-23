@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
-import useSound from "use-sound";
 import PauseCircleOutlineIcon from "@mui/icons-material/PauseCircleOutline";
 import TypeBadge from "../resources/typecolours.tsx";
+import PlaySound from "../resources/PlaySound.jsx"; // Adjust the path as necessary
 
 const modalStyle = {
     position: "fixed",
@@ -37,41 +37,6 @@ const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 const PokemonInfoModal = ({ pokemon, onClose }) => {
     if (!pokemon) return null;
 
-    const PlaySound = () => {
-        const [isPlaying, setIsPlaying] = useState(false);
-
-        const [play, { sound, stop }] = useSound(pokemon.cries?.latest, {
-            volume: 0.15,
-            onend: () => setIsPlaying(false),
-        });
-
-        const togglePlay = () => {
-            if (isPlaying) {
-                stop();
-                setIsPlaying(false);
-            } else {
-                play();
-                setIsPlaying(true);
-            }
-        };
-
-        useEffect(() => {
-            return () => {
-                stop();
-            };
-        }, [stop]);
-
-        return (
-            <IconButton onClick={togglePlay} aria-label="sound">
-                {isPlaying ? (
-                    <PauseCircleOutlineIcon />
-                ) : (
-                    <PlayCircleOutlineIcon />
-                )}
-            </IconButton>
-        );
-    };
-
     return (
         <>
             <div style={overlayStyle} onClick={onClose} />
@@ -99,7 +64,7 @@ const PokemonInfoModal = ({ pokemon, onClose }) => {
                 )}
 
                 <div>
-                    Play sound: <PlaySound />
+                    Play sound: <PlaySound pokemonSound={pokemon.cries?.latest} />
                 </div>
 
                 <p>
@@ -116,12 +81,10 @@ const PokemonInfoModal = ({ pokemon, onClose }) => {
                         .join(", ")}
                 </p>
                 <p>
-                    <strong>Height:</strong> {(pokemon.height / 10).toFixed(1)}{" "}
-                    m
+                    <strong>Height:</strong> {(pokemon.height / 10).toFixed(1)} m
                 </p>
                 <p>
-                    <strong>Weight:</strong> {(pokemon.weight / 10).toFixed(1)}{" "}
-                    kg
+                    <strong>Weight:</strong> {(pokemon.weight / 10).toFixed(1)} kg
                 </p>
 
                 <p>
@@ -129,48 +92,26 @@ const PokemonInfoModal = ({ pokemon, onClose }) => {
                 </p>
                 <ul>
                     <li>
-                        🧡 HP:{" "}
-                        {
-                            pokemon.stats.find((s) => s.stat.name === "hp")
-                                ?.base_stat
-                        }
+                        🧡 HP: {pokemon.stats.find((s) => s.stat.name === "hp")?.base_stat}
                     </li>
                     <li>
                         ⚔️ Attack:{" "}
-                        {
-                            pokemon.stats.find((s) => s.stat.name === "attack")
-                                ?.base_stat
-                        }
+                        {pokemon.stats.find((s) => s.stat.name === "attack")?.base_stat}
                     </li>
                     <li>
                         🛡️ Defense:{" "}
-                        {
-                            pokemon.stats.find((s) => s.stat.name === "defense")
-                                ?.base_stat
-                        }
+                        {pokemon.stats.find((s) => s.stat.name === "defense")?.base_stat}
                     </li>
                     <li>
                         🔥 Special Attack:{" "}
-                        {
-                            pokemon.stats.find(
-                                (s) => s.stat.name === "special-attack"
-                            )?.base_stat
-                        }
+                        {pokemon.stats.find((s) => s.stat.name === "special-attack")?.base_stat}
                     </li>
                     <li>
                         🧊 Special Defence:{" "}
-                        {
-                            pokemon.stats.find(
-                                (s) => s.stat.name === "special-defense"
-                            )?.base_stat
-                        }
+                        {pokemon.stats.find((s) => s.stat.name === "special-defense")?.base_stat}
                     </li>
                     <li>
-                        💨 Speed:{" "}
-                        {
-                            pokemon.stats.find((s) => s.stat.name === "speed")
-                                ?.base_stat
-                        }
+                        💨 Speed: {pokemon.stats.find((s) => s.stat.name === "speed")?.base_stat}
                     </li>
                 </ul>
             </div>

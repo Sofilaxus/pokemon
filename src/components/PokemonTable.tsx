@@ -52,62 +52,118 @@ const PokemonTable = ({
     const totalPages = Math.ceil(filteredPokemon.length / limit);
     const currentPage = Math.floor(offset / limit) + 1;
 
+    const getPokemonId = (url: string) => {
+        const match = url.match(/\/pokemon\/(\d+)\//);
+        return match ? match[1] : null;
+    };
+
+    const getImageUrl = (url: string) => {
+        const id = getPokemonId(url);
+        return id
+            ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`
+            : "";
+    };
+
+    const getPokemonByType = async (type: string): Promise<string[]> => {
+        try {
+            const res = await fetch(`https://pokeapi.co/api/v2/type/${type}`);
+            const data = await res.json();
+            return data.pokemon.map((p: any) => p.pokemon.name);
+        } catch (e) {
+            console.error("Failed to fetch Pokémon by type", e);
+            return [];
+        }
+    };
+
+    const fetchPokemonDetails = async (url: string) => {
+        setIsLoadingModal(true);
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            setSelectedPokemon(data);
+        } catch (error) {
+            console.error("Error fetching Pokémon details:", error);
+        } finally {
+            setIsLoadingModal(false);
+        }
+    };
+
+    const fetchAllPokemon = async () => {
+        setIsLoadingPage(true);
+        try {
+            const countRes = await fetch(
+                `https://pokeapi.co/api/v2/pokemon?limit=1`
+            );
+            const countData = await countRes.json();
+            setCount(countData.count);
+
+            const allRes = await fetch(
+                `https://pokeapi.co/api/v2/pokemon?limit=${countData.count}`
+            );
+            const allData = await allRes.json();
+            setAllPokemon(allData.results);
+        } catch (error) {
+            console.error("Error fetching all Pokémon:", error);
+        } finally {
+            setIsLoadingPage(false);
+        }
+    };
+
+    const fetchTypesForPage = async () => {
+        const newTypes: Record<string, string[]> = {};
+
+        await Promise.all(
+            paginatedList.map(async (pokemon) => {
+                if (!pokemonTypesRef.current[pokemon.name]) {
+                    try {
+                        const res = await fetch(pokemon.url);
+                        const data = await res.json();
+                        newTypes[pokemon.name] = data.types.map(
+                            (t: any) => t.type.name
+                        );
+                    } catch (error) {
+                        console.error(
+                            "Failed to fetch types for",
+                            pokemon.name,
+                            error
+                        );
+                        newTypes[pokemon.name] = [];
+                    }
+                }
+            })
+        );
+
+        if (Object.keys(newTypes).length > 0) {
+            pokemonTypesRef.current = {
+                ...pokemonTypesRef.current,
+                ...newTypes,
+            };
+            setPokemonTypes(pokemonTypesRef.current);
+        }
+    };
+
+    const filterByTypes = async () => {
+        if (selectedTypes.length === 0) {
+            setTypeFilteredPokemonNames(null);
+            return;
+        }
+
+        const allNamesArrays = await Promise.all(
+            selectedTypes.map((type) => getPokemonByType(type))
+        );
+
+        const intersection = allNamesArrays.reduce((acc, arr) =>
+            acc.filter((name) => arr.includes(name))
+        );
+
+        setTypeFilteredPokemonNames(intersection);
+    };
+
     useEffect(() => {
-        const fetchAllPokemon = async () => {
-            setIsLoadingPage(true);
-            try {
-                const countRes = await fetch(
-                    `https://pokeapi.co/api/v2/pokemon?limit=1`
-                );
-                const countData = await countRes.json();
-                setCount(countData.count);
-
-                const allRes = await fetch(
-                    `https://pokeapi.co/api/v2/pokemon?limit=${countData.count}`
-                );
-                const allData = await allRes.json();
-                setAllPokemon(allData.results);
-            } catch (error) {
-                console.error("Error fetching all Pokémon:", error);
-            } finally {
-                setIsLoadingPage(false);
-            }
-        };
-
         fetchAllPokemon();
     }, []);
 
     useEffect(() => {
-        const getPokemonByType = async (type: string): Promise<string[]> => {
-            try {
-                const res = await fetch(
-                    `https://pokeapi.co/api/v2/type/${type}`
-                );
-                const data = await res.json();
-                return data.pokemon.map((p: any) => p.pokemon.name);
-            } catch (e) {
-                console.error("Failed to fetch Pokémon by type", e);
-                return [];
-            }
-        };
-
-        const filterByTypes = async () => {
-            if (selectedTypes.length === 0) {
-                setTypeFilteredPokemonNames(null);
-                return;
-            }
-
-            const allNamesArrays = await Promise.all(
-                selectedTypes.map((type) => getPokemonByType(type))
-            );
-
-            const intersection = allNamesArrays.reduce((acc, arr) =>
-                acc.filter((name) => arr.includes(name))
-            );
-
-            setTypeFilteredPokemonNames(intersection);
-        };
-
         filterByTypes();
     }, [selectedTypes]);
 
@@ -133,66 +189,8 @@ const PokemonTable = ({
     }, [search, typeFilteredPokemonNames, allPokemon]);
 
     useEffect(() => {
-        const fetchTypesForPage = async () => {
-            const newTypes: Record<string, string[]> = {};
-
-            await Promise.all(
-                paginatedList.map(async (pokemon) => {
-                    if (!pokemonTypesRef.current[pokemon.name]) {
-                        try {
-                            const res = await fetch(pokemon.url);
-                            const data = await res.json();
-                            newTypes[pokemon.name] = data.types.map(
-                                (t: any) => t.type.name
-                            );
-                        } catch (error) {
-                            console.error(
-                                "Failed to fetch types for",
-                                pokemon.name,
-                                error
-                            );
-                            newTypes[pokemon.name] = [];
-                        }
-                    }
-                })
-            );
-
-            if (Object.keys(newTypes).length > 0) {
-                pokemonTypesRef.current = {
-                    ...pokemonTypesRef.current,
-                    ...newTypes,
-                };
-                setPokemonTypes(pokemonTypesRef.current);
-            }
-        };
-
         fetchTypesForPage();
     }, [paginatedList]);
-
-    const fetchPokemonDetails = async (url: string) => {
-        setIsLoadingModal(true);
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
-            setSelectedPokemon(data);
-        } catch (error) {
-            console.error("Error fetching Pokémon details:", error);
-        } finally {
-            setIsLoadingModal(false);
-        }
-    };
-
-    const getPokemonId = (url: string) => {
-        const match = url.match(/\/pokemon\/(\d+)\//);
-        return match ? match[1] : null;
-    };
-
-    const getImageUrl = (url: string) => {
-        const id = getPokemonId(url);
-        return id
-            ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`
-            : "";
-    };
 
     useEffect(() => {
         if (selectedPokemon) {
@@ -218,14 +216,12 @@ const PokemonTable = ({
                 overflow: "hidden",
             }}
         >
-
             <Box sx={{ padding: 2 }}>
                 <Typography variant="h6" gutterBottom>
                     There are currently {count} Pokémon! This list contains{" "}
                     {filteredPokemon.length} pokémon.
                 </Typography>
             </Box>
-
 
             <Box
                 sx={{

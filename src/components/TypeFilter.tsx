@@ -26,6 +26,14 @@ const TypeFilter: React.FC<TypeFilterProps> = ({
 }) => {
     const [allTypes, setAllTypes] = useState<Type[]>([]);
 
+    const handleClick = (typeName: string) => {
+        if (selectedTypes.includes(typeName)) {
+            setSelectedTypes(selectedTypes.filter((t) => t !== typeName));
+        } else {
+            setSelectedTypes([...selectedTypes, typeName]);
+        }
+    };
+
     const { fetchData: fetchAllTypes } = useAxios<TAllTypes>({
         url: `https://pokeapi.co/api/v2/type/`,
         initialData: null,
@@ -44,14 +52,6 @@ const TypeFilter: React.FC<TypeFilterProps> = ({
         };
         getAllTypes();
     }, [fetchAllTypes]);
-
-    const handleClick = (typeName: string) => {
-        if (selectedTypes.includes(typeName)) {
-            setSelectedTypes(selectedTypes.filter((t) => t !== typeName));
-        } else {
-            setSelectedTypes([...selectedTypes, typeName]);
-        }
-    };
 
     return (
         <List
