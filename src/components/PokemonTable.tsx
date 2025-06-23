@@ -132,8 +132,6 @@ const PokemonTable = () => {
     const paginatedList = isSearchMode
         ? filteredList.slice(offset, offset + limit)
         : filteredList;
-    const canGoPrevious = offset > 0;
-    const canGoNext = offset + limit < count;
     const totalPages = isSearchMode
         ? Math.ceil(filteredList.length / limit)
         : Math.ceil(count / limit);

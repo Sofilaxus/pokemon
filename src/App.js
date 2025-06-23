@@ -37,10 +37,11 @@ function App() {
             <Box
                 sx={{
                     display: "flex",
-                    justifyContent: "space-between",
+                    justifyContent: "center",
                     marginTop: 2,
                     alignItems: "center",
                     flexDirection: "row",
+                    gap: 4,
                 }}
             >
                 <NavigationBar />

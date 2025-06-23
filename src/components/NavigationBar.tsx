@@ -50,7 +50,7 @@ const NavigationBar = () => {
         <Box
             sx={{
                 width: 200,
-                height: 650,
+                height: 673,
                 bgcolor: "#f0f0f0",
                 p: 2,
                 display: "flex",
